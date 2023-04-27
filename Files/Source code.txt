@@ -1,0 +1,39 @@
+import pandas as pd
+import os
+import smtplib
+import mimetypes
+from email.message import EmailMessage
+
+df = pd.read_csv('newww.csv')
+
+server = smtplib.SMTP('smtp.gmail.com', 587)
+server.starttls()
+server.login('enter_mail_here', 'enter_key_here')
+
+for index, row in df.iterrows():
+    name = row['NAME']
+    email = row['MAIL']
+    reply = row['REPLY']
+    file_path = os.path.join(r'C:\Users\Desktop',reply)
+    
+    # Create email message
+    msg = EmailMessage()
+    msg['Subject'] = ' JUST CHECKING'
+    msg['From'] = 'enter_mail_here'
+    msg['To'] = email
+    msg.set_content('NOTHING')
+    
+    file_type, encoding = mimetypes.guess_type(file_path)
+    if file_type is None:
+        file_type = 'application/octet-stream'
+    file_type_main, file_type_sub = file_type.split('/', 1)
+    
+    # Attach PDF file
+    with open(pdf_path, 'rb') as f:
+        file_data = f.read()
+    msg.add_attachment(file_data, maintype=file_type_main, subtype=file_type_sub, filename=reply)
+    
+    # Send email
+    server.send_message(msg)
+
+server.quit()
